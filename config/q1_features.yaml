@@ -1,0 +1,24 @@
+schema_version: q1-config@1.0
+seed: 20260923
+input:
+  search_root: data/raw/extracted
+  label_glob: "**/label-100.xlsx"
+  video_glob: "**/*.mp4"
+output:
+  directory: results/q1
+  max_length: 50
+text:
+  dimension: 128
+audio:
+  sample_rate: 16000
+  window_sec: 0.025
+  hop_sec: 0.010
+  mel_bins: 40
+  mfcc_bins: 13
+vision:
+  sample_fps: 5.0
+  hsv_bins_per_channel: 8
+alignment:
+  method: proportional
+  is_fallback: true
+
