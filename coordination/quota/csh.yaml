@@ -1,14 +1,14 @@
 schema_version: "1.0"
 user: csh
-checked_at: "2026-09-23T17:03:47+08:00"
+checked_at: "2026-09-23T18:31:34+08:00"
 source: "Codex account usage limits (platform)"
 five_hour:
-  remaining_percent: 95
-  reset_at: "2026-09-23T21:35:46+08:00"
+  remaining_percent: 15
+  reset_at: "2026-09-23T21:35:45+08:00"
 weekly:
-  remaining_percent: 91
+  remaining_percent: 79
   reset_at: "2026-09-30T11:35:31+08:00"
 warning_shown: false
-state: GREEN
-active_task_id: "E-csh-skill-install-001"
-next_check_at: "2026-09-23T17:48:47+08:00"
+state: RED
+active_task_id: "E-D1-CSH-05-RED-CLOSEOUT"
+next_check_at: "2026-09-23T21:35:45+08:00"

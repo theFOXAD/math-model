@@ -1,24 +1,24 @@
 # Handoff: csh
 
-- task_id: `E-csh-skill-install-001`
+- task_id: `E-D1-CSH-05-RED-CLOSEOUT`
 - owner: `csh`
-- state: `complete`
-- branch: `feat/csh-session-bootstrap`
-- head_commit: `4982c5eb4abda96fca8185c100437b56817148be`
-- working_tree: `modified; startup coordination and Memory Bank files are not yet committed`
-- completed: `Installed the two requested local Codex skills under their declared names: e-modeling-team-orchestrator and math-modeling.`
-- changed_files: `C:/Users/FOXAD/.codex/skills/e-modeling-team-orchestrator/**`, `C:/Users/FOXAD/.codex/skills/math-modeling/**`, `coordination/quota/csh.yaml`, `coordination/handoffs/csh.md`
-- commands_run: `Copy-Item -Recurse for both skill roots`, `Get-ChildItem -Recurse file-count verification`, `Get-FileHash -Algorithm SHA256 for both SKILL.md files`
-- verification: `e-modeling-team-orchestrator source/destination file counts 6/6; math-modeling counts 249/249; both installed SKILL.md SHA-256 hashes match their sources`
-- artifacts_created: `C:/Users/FOXAD/.codex/skills/e-modeling-team-orchestrator`, `C:/Users/FOXAD/.codex/skills/math-modeling`
-- interfaces_read: `local skill manifests; quota-snapshot@1 platform source; no project data interface`
-- interfaces_written: `quota-snapshot@1, handoff@1`
-- decisions: `Install the second skill as math-modeling because that is the name declared in its nested SKILL.md, not the archive folder name math-modeling-skill-main.`
-- uncommitted_work: `Existing startup coordination and Memory Bank changes remain uncommitted; this handoff and quota snapshot are also uncommitted.`
-- blockers: `No installation blocker. The new skills become available to Codex on the next turn.`
-- next_atomic_action: `Create config/q1_dataset_inventory.yaml defining the external source-data path, version identifier, and SHA-256 inventory inputs without committing raw data.`
-- resume_command: `git switch feat/csh-session-bootstrap && git status --short`
-- quota_state: `GREEN`
+- state: `stopped_red_quota; q1 implementation complete, P2 pending`
+- branch: `feat/csh-q1-data-alignment`
+- head_commit: `db213501daa7e8d255d0c30ee7fc12b77758bbaf`
+- working_tree: `expected clean after this coordination checkpoint commit; ignored smoke outputs and local caches remain by design`
+- completed: `Completed Q1 model contract, deterministic extraction, 100-sample run, 18-overlap audit, result report, and 9 data figures plus 1 flowchart. M1 and P1 passed.`
+- changed_files: `config/q1_*`, `src/data/q1_dataset.py`, `src/features/q1_extract.py`, `scripts/q1_*`, `results/q1/**`, `figures/q1/**`, `题目分析报告.md`, `术语表格.md`, coordination and Memory Bank files
+- commands_run: `.venv/Scripts/python -X utf8 scripts/q1_extract_features.py --output-dir results/q1`; `.venv/Scripts/python -X utf8 scripts/q1_overlap_audit.py --q1-dir results/q1`; `.venv/Scripts/python -X utf8 scripts/q1_make_figures.py`; `check_figure.py <each png/svg> --strict`; `figure_audit.py figures/q1 --questions q1 --strict`; checksum verification; `git diff --check`
+- verification: `P1 PASS; 100 samples; tensors [100,50,128]/[100,50,74]/[100,50,35] float32; all finite/mask/interval invariants true; checksum_mismatches=0; 20 figure files individually PASS; figure_audit ok=true; visual review completed.`
+- artifacts_created: `results/q1/q1_features.npz`, `q1_samples.csv`, `q1_alignment.csv`, `q1_feature_manifest.csv`, `q1_overlap_similarity.csv`, `q1_report.md`, `q1_checksums.sha256`; `figures/q1/*.png`; `figures/q1/*.svg`
+- interfaces_read: `Attachment-1 labels/videos; Attachment-2 aligned_50.pkl reference for 18 IDs; no frozen cross-user interface consumed`
+- interfaces_written: `quota-snapshot@1; handoff@1; no I01/I02/I09 published`
+- decisions: `Use deterministic SHA-256 text hashing, true triangular log-Mel/MFCC, lightweight OpenCV visual descriptors, and explicit proportional fallback. Keep Q1 local because Attachment-1 lacks legal I01 split values. Exclude PyArrow from Q1 because CSV/NPZ do not require it.`
+- uncommitted_work: `No substantive work intended. Ignored results/q1_smoke*, .matplotlib-cache, .venv and extracted raw data remain local.`
+- blockers: `Five-hour quota RED (15% remaining). Independent P2 and I09 approval were not started. Results remain draft.`
+- next_atomic_action: `After a fresh non-RED quota check, assign an independent read-only P2 review of commit db213501daa7e8d255d0c30ee7fc12b77758bbaf using the programming and figure audit checklists.`
+- resume_command: `git switch feat/csh-q1-data-alignment; git status --short; .venv\Scripts\python.exe -m pip check`
+- quota_state: `RED`
 - quota_source: `Codex account usage limits (platform)`
-- quota_checked_at: `2026-09-23T17:03:47+08:00`
-- quota_reset_at: `five_hour=2026-09-23T21:35:46+08:00; weekly=2026-09-30T11:35:31+08:00`
+- quota_checked_at: `2026-09-23T18:31:34+08:00`
+- quota_reset_at: `five_hour=2026-09-23T21:35:45+08:00; weekly=2026-09-30T11:35:31+08:00`
