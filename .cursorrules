@@ -1,0 +1,5 @@
+Before editing, read AGENTS.md and the files under memory-bank/.
+Never develop directly on main.
+Preserve unrelated user changes and keep generated data out of Git.
+At task completion, update memory-bank/activeContext.md and memory-bank/progress.md.
+Follow docs/GIT_WORKFLOW.md for commits, reviews, and merges.

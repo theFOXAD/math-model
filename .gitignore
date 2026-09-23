@@ -1,0 +1,40 @@
+# 原始数据与压缩包
+data/raw/
+*.zip
+*.7z
+*.tar
+*.gz
+*.xz
+*.parquet
+
+# 运行产物
+outputs/
+artifacts/
+checkpoints/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# R / Matlab / Jupyter
+.Rhistory
+.RData
+*.asv
+.ipynb_checkpoints/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 密钥与本地配置
+.env
+.env.*
+!.env.example
