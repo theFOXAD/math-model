@@ -52,15 +52,24 @@ def procrustes_residual(x: np.ndarray, y: np.ndarray) -> tuple[float | None, int
     return float(np.linalg.norm(zx @ rotation - zy) / (np.linalg.norm(zy) + EPS)), rank
 
 
-def metric_row(sample_id: str, split: str, modality: str, x: np.ndarray, y: np.ndarray) -> dict:
-    valid = (np.linalg.norm(x, axis=1) > EPS) & (np.linalg.norm(y, axis=1) > EPS)
+def metric_row(sample_id: str, split: str, modality: str, x: np.ndarray, y: np.ndarray,
+               valid: np.ndarray) -> dict:
     xv, yv = x[valid].astype(np.float64), y[valid].astype(np.float64)
     cka = centered_cka(xv, yv)
     residual, rank = procrustes_residual(xv, yv)
     status = "ok" if cka is not None and residual is not None else "insufficient_variation"
+    if int(valid.sum()) < 2:
+        reason = "fewer_than_two_mask-valid_positions"
+    elif np.linalg.norm(xv - xv.mean(axis=0, keepdims=True)) <= EPS:
+        reason = "q1_representation_constant"
+    elif np.linalg.norm(yv - yv.mean(axis=0, keepdims=True)) <= EPS:
+        reason = "reference_representation_constant"
+    else:
+        reason = "none"
     return {"sample_id": sample_id, "reference_split": split, "modality": modality,
             "common_position_count": int(valid.sum()), "common_rank": rank,
-            "centered_linear_cka": cka, "procrustes_residual": residual, "status": status}
+            "centered_linear_cka": cka, "procrustes_residual": residual,
+            "status": status, "status_reason": reason}
 
 
 def main() -> None:
@@ -85,15 +94,21 @@ def main() -> None:
     for sample_id in overlap:
         oi = our_index[sample_id]
         split, ri = reference_index[sample_id]
+        # Attachment-2 stores its authoritative alignment mask in text_bert[:, 1].
+        # Q1 availability comes only from explicit masks; zero-valued features are legal data.
+        reference_mask = reference[split]["text_bert"][ri, 1].astype(bool)
         for modality in ("text", "audio", "vision"):
             x = ours[modality][oi]
             y = reference[split][modality][ri]
-            rows.append(metric_row(sample_id, split, modality, x, y))
-            valid = (np.linalg.norm(x, axis=1) > EPS) & (np.linalg.norm(y, axis=1) > EPS)
+            valid = (ours[f"valid_{modality}"][oi].astype(bool)
+                     & ~ours["padding_mask"][oi].astype(bool) & reference_mask)
+            rows.append(metric_row(sample_id, split, modality, x, y, valid))
             aggregate[modality][0].append(x[valid])
             aggregate[modality][1].append(y[valid])
     for modality, (xs, ys) in aggregate.items():
-        rows.append(metric_row("__aggregate__", "mixed", modality, np.concatenate(xs), np.concatenate(ys)))
+        x, y = np.concatenate(xs), np.concatenate(ys)
+        rows.append(metric_row("__aggregate__", "mixed", modality, x, y,
+                               np.ones(len(x), dtype=bool)))
     output_path = q1_dir / "q1_overlap_similarity.csv"
     pd.DataFrame(rows).to_csv(output_path, index=False, encoding="utf-8-sig")
     reproduction = {"schema_version": "q1-overlap-reproduction@1.0",
@@ -105,9 +120,6 @@ def main() -> None:
                     "output_sha256": sha256(output_path)}
     (q1_dir / "q1_overlap_reproduction.json").write_text(
         json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
-    checksum_files = sorted(p for p in q1_dir.iterdir() if p.is_file() and p.name != "q1_checksums.sha256")
-    (q1_dir / "q1_checksums.sha256").write_text(
-        "\n".join(f"{sha256(p)}  {p.name}" for p in checksum_files) + "\n", encoding="utf-8")
     print(json.dumps({"overlap_count": len(overlap), "row_count": len(rows),
                       "status_counts": pd.Series([row["status"] for row in rows]).value_counts().to_dict()},
                      ensure_ascii=False))
@@ -115,4 +127,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

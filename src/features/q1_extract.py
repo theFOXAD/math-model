@@ -21,6 +21,9 @@ EPS = 1e-8
 @dataclass
 class MediaData:
     duration: float
+    container_duration: float
+    audio_duration: float
+    video_duration: float
     audio: np.ndarray
     audio_rate: int
     video_frames: list[np.ndarray]
@@ -72,7 +75,10 @@ def text_descriptor(anchor: str, left: str, right: str, position: int, total: in
 def decode_media(path: Path, target_audio_rate: int, target_video_fps: float) -> MediaData:
     audio_chunks: list[np.ndarray] = []
     source_audio_rate = target_audio_rate
+    container_duration = 0.0
     with av.open(str(path)) as container:
+        if container.duration is not None:
+            container_duration = float(container.duration / av.time_base)
         if not container.streams.audio:
             audio = np.empty(0, dtype=np.float32)
         else:
@@ -93,21 +99,30 @@ def decode_media(path: Path, target_audio_rate: int, target_video_fps: float) ->
     frames: list[np.ndarray] = []
     times: list[float] = []
     source_fps = 0.0
+    video_duration = 0.0
     with av.open(str(path)) as container:
         if container.streams.video:
             stream = container.streams.video[0]
             source_fps = float(stream.average_rate or 0.0)
+            if stream.duration is not None and stream.time_base is not None:
+                video_duration = float(stream.duration * stream.time_base)
             next_time = 0.0
             for index, frame in enumerate(container.decode(stream)):
                 timestamp = float(frame.time) if frame.time is not None else index / max(source_fps, target_video_fps)
+                frame_width = (float(frame.duration * frame.time_base)
+                               if frame.duration is not None and frame.time_base is not None
+                               else 1.0 / max(source_fps, target_video_fps))
+                video_duration = max(video_duration, timestamp + frame_width)
                 if timestamp + 1e-9 >= next_time:
                     frames.append(frame.to_ndarray(format="bgr24"))
                     times.append(timestamp)
                     next_time += 1.0 / target_video_fps
     audio_duration = audio.size / target_audio_rate if audio.size else 0.0
-    video_duration = (times[-1] + 1.0 / target_video_fps) if times else 0.0
-    return MediaData(max(audio_duration, video_duration), audio.astype(np.float32), target_audio_rate,
-                     frames, np.asarray(times, dtype=np.float64), source_fps)
+    bounded_durations = [value for value in (container_duration, audio_duration, video_duration) if value > 0]
+    duration = min(bounded_durations) if bounded_durations else 0.0
+    return MediaData(duration, container_duration, audio_duration, video_duration,
+                     audio.astype(np.float32), target_audio_rate, frames,
+                     np.asarray(times, dtype=np.float64), source_fps)
 
 
 def _audio_frames(segment: np.ndarray, rate: int, window_sec: float, hop_sec: float) -> np.ndarray:
@@ -237,7 +252,10 @@ def extract_sample(sample, config: dict) -> dict:
                            "start_sec": start, "end_sec": end, "audio_start_idx": a0,
                            "audio_end_idx": a1, "video_start_idx": v0, "video_end_idx": v1,
                            "confidence": confidence, "method": "proportional", "is_fallback": True})
-    return {"anchors": anchors, "duration": media.duration, "source_fps": media.source_fps,
+    return {"anchors": anchors, "duration": media.duration,
+            "source_duration": media.container_duration,
+            "audio_duration": media.audio_duration, "video_duration": media.video_duration,
+            "source_fps": media.source_fps,
             "audio_rate": media.audio_rate, "face_detection_rate": face_rate,
             "audio_sample_count": len(media.audio), "video_frame_count": len(media.video_frames),
             "text": text, "audio": audio, "vision": vision, "valid_text": valid_text,

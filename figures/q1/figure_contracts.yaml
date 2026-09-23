@@ -1,0 +1,59 @@
+schema_version: q1-figure-contracts@1.0
+shared_style:
+  language: English
+  png_dpi: 300
+  formats:
+  - svg
+  - png
+  grayscale_qa_dir: ../q1_qa
+figures:
+- name: raw_q1_class_distribution
+  category: raw
+  claim: Attachment-1 class composition
+  source: q1_samples.csv
+  evidence: class counts and n labels
+- name: raw_q1_duration_histogram
+  category: raw
+  claim: clip-duration distribution
+  source: q1_feature_manifest.csv
+  evidence: histogram and median
+- name: raw_q1_words_duration_scatter
+  category: raw
+  claim: text length versus duration
+  source: q1_samples.csv + q1_feature_manifest.csv
+  evidence: sample-level scatter
+- name: process_q1_anchor_lengths
+  category: process
+  claim: post-grouping anchor lengths
+  source: q1_samples.csv
+  evidence: sequence-length histogram
+- name: process_q1_validity_boxstrip
+  category: process
+  claim: per-modality valid-anchor ratios
+  source: q1_feature_manifest.csv
+  evidence: box and all sample points
+- name: process_q1_typical_timeline
+  category: process
+  claim: text, audio and video share proportional anchors
+  source: q1_alignment.csv + q1_features.npz
+  evidence: three aligned lanes and feature-norm curves
+- name: result_q1_coverage
+  category: result
+  claim: full-sample valid-anchor coverage
+  source: q1_feature_manifest.csv
+  evidence: three labeled coverage bars
+- name: result_q1_overlap_cka
+  category: result
+  claim: representation agreement on shared samples
+  source: q1_overlap_similarity.csv
+  evidence: valid CKA estimates with per-modality n
+- name: result_q1_overlap_procrustes
+  category: result
+  claim: cross-representation residuals
+  source: q1_overlap_similarity.csv
+  evidence: boxplots, points and per-modality n
+- name: flow_overall_model
+  category: flow
+  claim: implemented extraction and audit order
+  source: scripts/q1_*.py
+  evidence: anchors precede pooling; 18-ID audit branch shown

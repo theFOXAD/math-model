@@ -21,7 +21,7 @@
 - [x] 完成附件1 100 条三模态特征与 proportional 对齐
 - [x] 完成 18 条附件2重叠样本 CKA/Procrustes 审计
 - [x] 生成并机器/人工审计第一问 9 张候选图与 1 张流程图
-- [ ] 额度恢复后执行独立 P2 终检并决定是否冻结第一问结果
+- [x] 修复 P2 初检问题并完成独立 P2 终检（P0=0、P1=0，PASS）
 - [ ] 生产并验证 `dataset-bundle@1`
 - [ ] 生产并验证 `alignment-bundle@1`
 - [ ] 建立数据处理、建模、验证和制图流程
@@ -32,4 +32,4 @@
 - 问题一环境已锁定在 `config/q1_requirements.lock.txt`；Q1 使用 CSV/NPZ，不依赖 Python 3.14 下缺少锁定轮子的 PyArrow。
 - 原始附件位于 Git 忽略目录，输入与结果哈希已写入复现清单。
 - `csh` 尚未发布可供消费者独立加载的 frozen exchange bundle。
-- 当前 five-hour 额度 RED；P2 与 I09 暂停至 2026-09-23 21:35:45（Asia/Shanghai）之后重新核验额度。
+- 第一问本地结果已 validated；尚未发布 frozen I01/I02，且 I09 仍需 wc 审批。

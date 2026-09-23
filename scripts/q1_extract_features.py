@@ -77,8 +77,10 @@ def main() -> None:
             warnings = "" if result[valid_key].sum() == sequence_length else "invalid_nonpadding_positions"
             manifest_rows.append({"sample_id": sample.sample_id, "modality": modality,
                                   "source_path": sample.source_path.relative_to(REPO).as_posix(),
-                                  "source_duration_sec": result["duration"],
-                                  "stream_duration_sec": result["duration"],
+                                  "source_duration_sec": result["source_duration"],
+                                  "stream_duration_sec": (result["audio_duration"] if modality == "audio" else
+                                                          result["video_duration"] if modality == "vision" else
+                                                          result["duration"]),
                                   "sample_rate_or_fps": result["audio_rate"] if modality == "audio" else
                                   (result["source_fps"] if modality == "vision" else "n/a"),
                                   "raw_shape": "n/a", "feature_dim": dimension,
@@ -105,7 +107,8 @@ def main() -> None:
         "- `q1_alignment.csv`: zero-based text anchors mapped to half-open time/sample/frame ranges.\n"
         "- `q1_feature_manifest.csv`: per-sample and per-modality quality rows.\n"
         "- `q1_normalization.json`: confirms that no train-fitted normalization was applied.\n"
-        "- `复现清单.json`: command, versions, hashes and invariant checks.\n\n"
+        "- `q1_extraction_reproduction.json`: extraction command, versions, hashes and invariant checks.\n"
+        "- `../复现清单.json`: the single full-chain reproduction record.\n\n"
         "Load with `numpy.load('q1_features.npz')` and `pandas.read_csv(...)`. Missingness must be "
         "read from masks; never infer it from zero-valued features.\n",
         encoding="utf-8",
@@ -134,6 +137,12 @@ def main() -> None:
                                                   for key in ("injected_missing_audio", "injected_missing_vision")),
         "alignment_interval_legal": all(r["end_sec"] > r["start_sec"] >= 0 for r in alignment_rows),
         "alignment_contiguous_and_bounded": interval_coverage,
+        "alignment_end_within_streams": all(
+            result["duration"] <= duration + 1e-7
+            for _, result in extracted
+            for duration in (result["source_duration"], result["audio_duration"], result["video_duration"])
+            if duration > 0
+        ),
     }
     if not all(value for key, value in invariants.items() if key not in {"sample_count", "shape_text", "shape_audio", "shape_vision"}):
         raise RuntimeError(f"output invariant failed: {invariants}")
@@ -151,10 +160,8 @@ def main() -> None:
                                     for sample, _ in extracted}},
         "invariants": invariants,
         "outputs": {p.name: sha256(p) for p in outputs}}
-    (output / "复现清单.json").write_text(json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
-    checksum_files = sorted(p for p in output.iterdir() if p.is_file() and p.name != "q1_checksums.sha256")
-    (output / "q1_checksums.sha256").write_text("\n".join(f"{sha256(p)}  {p.name}" for p in checksum_files) + "\n",
-                                                 encoding="utf-8")
+    (output / "q1_extraction_reproduction.json").write_text(
+        json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(invariants, ensure_ascii=False), flush=True)
 
 
