@@ -1,14 +1,14 @@
 schema_version: "1.0"
 user: csh
-checked_at: "2026-09-23T22:48:46+08:00"
+checked_at: "2026-09-23T22:54:30+08:00"
 source: "Codex account usage limits (platform)"
 five_hour:
-  remaining_percent: 41
+  remaining_percent: 36
   reset_at: "2026-09-24T02:40:35+08:00"
 weekly:
-  remaining_percent: 67
+  remaining_percent: 66
   reset_at: "2026-09-30T11:35:31+08:00"
 warning_shown: false
 state: GREEN
 active_task_id: null
-next_check_at: "2026-09-23T23:33:46+08:00"
+next_check_at: "2026-09-23T23:39:30+08:00"
