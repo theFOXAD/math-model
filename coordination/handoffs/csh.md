@@ -4,8 +4,8 @@
 - owner: `csh`
 - state: `complete; Q1 P2 PASS and local result validated; not frozen`
 - branch: `feat/csh-q1-data-alignment`
-- head_commit: `pending atomic commit; parent=05553263b5d35392ad4835c58b61e32026615ecf`
-- working_tree: `expected clean after the atomic result commit and coordination checkpoint`
+- head_commit: `3613a6f9c1797d803c4bd8ec8735b05afb92397d`
+- working_tree: `clean after atomic result commit; this handoff pointer is the only coordination delta before its checkpoint commit`
 - completed: `Closed every independent P2 P0/P1 finding: explicit-mask-only overlap audit, stream-bounded alignment duration, complete three-modality correspondence figure, corrected flowchart, deterministic SVG/PNG, figure contracts and grayscale QA, and an absolute-path-safe single-command full reproduction entry. Independent second P2 review returned PASS.`
 - changed_files: `src/features/q1_extract.py; scripts/q1_extract_features.py; scripts/q1_overlap_audit.py; scripts/q1_make_figures.py; scripts/q1_run_all.py; results/q1/**; results/复现清单.json; figures/q1/**; figures/q1_qa/**; memory-bank/activeContext.md; memory-bank/progress.md; coordination/quota/csh.yaml; coordination/handoffs/csh.md`
 - commands_run: `.venv\\Scripts\\python.exe -X utf8 scripts\\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`; same command against an empty absolute directory; strict `figure_audit.py`; strict `check_figure.py`; checksum verification; deterministic redraw comparison; `git diff --check`
