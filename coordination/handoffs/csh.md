@@ -1,0 +1,24 @@
+# Handoff: csh
+
+- task_id: `E-csh-skill-install-001`
+- owner: `csh`
+- state: `complete`
+- branch: `feat/csh-session-bootstrap`
+- head_commit: `4982c5eb4abda96fca8185c100437b56817148be`
+- working_tree: `modified; startup coordination and Memory Bank files are not yet committed`
+- completed: `Installed the two requested local Codex skills under their declared names: e-modeling-team-orchestrator and math-modeling.`
+- changed_files: `C:/Users/FOXAD/.codex/skills/e-modeling-team-orchestrator/**`, `C:/Users/FOXAD/.codex/skills/math-modeling/**`, `coordination/quota/csh.yaml`, `coordination/handoffs/csh.md`
+- commands_run: `Copy-Item -Recurse for both skill roots`, `Get-ChildItem -Recurse file-count verification`, `Get-FileHash -Algorithm SHA256 for both SKILL.md files`
+- verification: `e-modeling-team-orchestrator source/destination file counts 6/6; math-modeling counts 249/249; both installed SKILL.md SHA-256 hashes match their sources`
+- artifacts_created: `C:/Users/FOXAD/.codex/skills/e-modeling-team-orchestrator`, `C:/Users/FOXAD/.codex/skills/math-modeling`
+- interfaces_read: `local skill manifests; quota-snapshot@1 platform source; no project data interface`
+- interfaces_written: `quota-snapshot@1, handoff@1`
+- decisions: `Install the second skill as math-modeling because that is the name declared in its nested SKILL.md, not the archive folder name math-modeling-skill-main.`
+- uncommitted_work: `Existing startup coordination and Memory Bank changes remain uncommitted; this handoff and quota snapshot are also uncommitted.`
+- blockers: `No installation blocker. The new skills become available to Codex on the next turn.`
+- next_atomic_action: `Create config/q1_dataset_inventory.yaml defining the external source-data path, version identifier, and SHA-256 inventory inputs without committing raw data.`
+- resume_command: `git switch feat/csh-session-bootstrap && git status --short`
+- quota_state: `GREEN`
+- quota_source: `Codex account usage limits (platform)`
+- quota_checked_at: `2026-09-23T17:03:47+08:00`
+- quota_reset_at: `five_hour=2026-09-23T21:35:46+08:00; weekly=2026-09-30T11:35:31+08:00`
