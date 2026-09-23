@@ -1,0 +1,60 @@
+schema_version: "1.0"
+task: "E problem question 1 source inventory"
+generated_at: "2026-09-23T17:20:00+08:00"
+source_data_version: "2026-cpmcm-e-problem-original"
+data_root_env: "E_MODELING_DATA_ROOT"
+source:
+  outer_archive: "E题.zip"
+  outer_archive_size_bytes: 1881458858
+  outer_archive_sha256: "d8fc2773c6d181f968523d4c781846572d8bdead29b78fac5d3e0ed7946aa5d8"
+  problem_document: "复杂场景下多模态情感预测的数学建模与算法设计.docx"
+  problem_document_size_bytes: 1004454
+  problem_document_sha256: "38cec978723bff36ab945fa98f6454558bb9084e2cd01d814dd6e38ab4b4c336"
+  inner_archive: "E题数据.zip"
+  inner_archive_size_bytes: 1884355282
+  inner_archive_sha256: "f895003abeb3e972e69ef9c457032720cbcb8ecd3d2261a0e30bc15667604acb"
+local_cache:
+  inner_archive: "data/raw/E题数据.zip"
+  extracted_root: "data/raw/extracted/E题数据"
+  git_tracked: false
+attachments:
+  attachment1:
+    description: "原始多模态样本"
+    file_count: 101
+    video_count: 100
+    label_workbook_count: 1
+    uncompressed_size_bytes: 103633174
+  attachment2:
+    description: "标准化多模态特征"
+    file_count: 3
+    aligned_pickle_size_bytes: 993842861
+    unaligned_pickle_size_bytes: 2897003035
+    label_workbook_size_bytes: 423826
+    sample_count: 4850
+  attachment3:
+    description: "模态缺失特征样本"
+    file_count: 60
+    pickle_count: 60
+    uncompressed_size_bytes: 16371919
+  attachment4:
+    description: "可解释专项视频样本与特征"
+    file_count: 80
+    pickle_count: 40
+    video_count: 40
+    uncompressed_size_bytes: 66546996
+q1_observed:
+  label_rows: 100
+  unique_sample_ids: 100
+  matched_video_files: 100
+  positive_count: 57
+  neutral_count: 25
+  negative_count: 18
+  label_min: -2.0
+  label_max: 2.6666667461395264
+  attachment2_overlap_count: 18
+  attachment2_overlap_train_count: 11
+  attachment2_overlap_test_count: 7
+  overlap_label_mismatch_count: 0
+notes:
+  - "All raw archives and extracted inputs remain under ignored data/raw or outside the repository."
+  - "Paths consumed by scripts are resolved from E_MODELING_DATA_ROOT; no personal absolute path is stored."
