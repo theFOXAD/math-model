@@ -1,0 +1,11 @@
+{
+  "schema_version": "q1-overlap-reproduction@1.0",
+  "command": "F:\\my_workspace\\e-modeling-team-orchestrator\\math-model\\.venv\\Scripts\\python.exe scripts\\q1_overlap_audit.py --q1-dir results/q1",
+  "python": "3.14.3",
+  "numpy": "2.5.3",
+  "q1_features_sha256": "993c476e81fd0302f0abf25e55365cc3b1fca3f6592b8d1c0c5746426811d3fa",
+  "reference_path": "data/raw/extracted/E题数据/附件2-数据集特征文件/aligned_50.pkl",
+  "reference_sha256": "66e867aa74bc70a844e806e5571e371c9abb4a35f9e2887ce9b4d97ff2cb8fcd",
+  "overlap_count": 18,
+  "output_sha256": "903618a1198bc07615edbfcacf2a24575f4110cf141623f97ef23c1d51ac8c27"
+}

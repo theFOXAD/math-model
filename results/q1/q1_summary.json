@@ -1,0 +1,69 @@
+{
+  "sample_count": 100,
+  "label_counts": {
+    "Negative": 18,
+    "Neutral": 25,
+    "Positive": 57
+  },
+  "duration_sec": {
+    "count": 100.0,
+    "mean": 7.958493402777777,
+    "std": 4.642319476077025,
+    "min": 2.4022,
+    "25%": 5.225,
+    "50%": 6.833333333333334,
+    "75%": 8.808333333333332,
+    "max": 29.433333333333334
+  },
+  "sequence_length": {
+    "count": 100.0,
+    "mean": 19.17,
+    "std": 10.022253017937413,
+    "min": 5.0,
+    "25%": 12.0,
+    "50%": 18.0,
+    "75%": 22.0,
+    "max": 50.0
+  },
+  "coverage": {
+    "text": 1.0,
+    "audio": 0.9979134063641106,
+    "vision": 0.9624413145539906
+  },
+  "overlap_count": 18,
+  "aggregate_similarity": [
+    {
+      "sample_id": "__aggregate__",
+      "reference_split": "mixed",
+      "modality": "text",
+      "common_position_count": 450,
+      "common_rank": 128,
+      "centered_linear_cka": 0.2091078389091258,
+      "procrustes_residual": 0.9706672294515424,
+      "status": "ok"
+    },
+    {
+      "sample_id": "__aggregate__",
+      "reference_split": "mixed",
+      "modality": "audio",
+      "common_position_count": 429,
+      "common_rank": 70,
+      "centered_linear_cka": 0.0812494370044454,
+      "procrustes_residual": 0.96524252897457,
+      "status": "ok"
+    },
+    {
+      "sample_id": "__aggregate__",
+      "reference_split": "mixed",
+      "modality": "vision",
+      "common_position_count": 396,
+      "common_rank": 35,
+      "centered_linear_cka": 0.0562362115478571,
+      "procrustes_residual": 0.9786278132794216,
+      "status": "ok"
+    }
+  ],
+  "figure_count": 10,
+  "layout_issue_count": 0,
+  "layout_issues": []
+}
