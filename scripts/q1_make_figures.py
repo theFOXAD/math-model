@@ -23,6 +23,12 @@ COLORS = {"text": "#0072B2", "audio": "#E69F00", "vision": "#CC79A7",
           "Negative": "#D55E00", "Neutral": "#777777", "Positive": "#0072B2"}
 
 
+def write_utf8_lf(path: Path, text: str) -> None:
+    """Write deterministic UTF-8 text without platform newline translation."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    path.write_bytes(normalized.encode("utf-8"))
+
+
 def setup_style() -> None:
     """Repository-local, portable publication style."""
     plt.rcParams.update({"figure.figsize": (7.2, 4.5), "font.size": 8,
@@ -42,7 +48,7 @@ def export(fig, base: Path, qa_dir: Path) -> list[dict]:
     svg_path = base.with_suffix(".svg")
     fig.savefig(svg_path, metadata={"Date": None})
     svg_text = svg_path.read_text(encoding="utf-8")
-    svg_path.write_text("\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n", encoding="utf-8")
+    write_utf8_lf(svg_path, "\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n")
     png_path = base.with_suffix(".png")
     fig.savefig(png_path, dpi=300, metadata={"Date": None})
     with Image.open(png_path) as rendered:
@@ -321,8 +327,8 @@ def main() -> None:
                          "notes": "The typical-timeline SVG intentionally embeds source-video raster thumbnails."},
         "figures": [{"name": name, "category": category, "claim": claim, "source": source, "evidence": evidence}
                     for name, category, claim, source, evidence in contracts]}
-    (figure_dir / "figure_contracts.yaml").write_text(
-        yaml.safe_dump(figure_contracts, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    write_utf8_lf(figure_dir / "figure_contracts.yaml",
+                  yaml.safe_dump(figure_contracts, allow_unicode=True, sort_keys=False))
 
     truncation_count = int(quality.container_truncation_suspected.sum())
     short_visual_count = int((alignment.video_sampled_frame_count <= 1).sum())
@@ -338,17 +344,18 @@ def main() -> None:
                "overlap_count": 18, "aggregate_similarity": aggregate.reset_index().to_dict("records"),
                "permutation_null": permutation.to_dict("records"), "figure_count": len(contracts),
                "grayscale_qa_count": len(contracts), "layout_issue_count": len(audit), "layout_issues": audit}
-    (result_dir / "q1_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_utf8_lf(result_dir / "q1_summary.json",
+                  json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
 
     report = f"""# E题第一问：复杂场景下多模态情感预测的特征提取与时序对齐
 
 ## 结论
 
-附件1的 100 条标签与 100 个 MP4 一一对应并全部进入结果集。可比较视图为文本、音频、视觉的 aligned-50 张量，形状分别为 `100×50×128`、`100×50×74`、`100×50×35`；另保留音频和视觉各自的 independent-500 序列，避免把原始高频时间结构永久压缩到文本锚点。所有缺失、有效和填充状态均由布尔掩码表达，禁止根据特征是否为零推断。
+附件1的 100 条标签与 100 个 MP4 一一对应并全部进入结果集。可比较视图为文本、音频、视觉的 aligned-50 张量，形状分别为 `100×50×128`、`100×50×74`、`100×50×35`；另保留音频和视觉各自的 independent-500 固定长度序列：不足 500 位时填充，超过 500 位时确定性等间隔采样。它比 aligned-50 保留更多时间位置，但不是无损的完整高频动态。所有缺失、有效和填充状态均由布尔掩码表达，禁止根据特征是否为零推断。
 
 实际可解码时间轴平均 {durations.mean():.3f} 秒（范围 {durations.min():.3f}--{durations.max():.3f} 秒），文本锚点平均 {samples.sequence_length.mean():.2f} 个。有效锚点覆盖率为文本 {coverage.text:.1%}、音频 {coverage.audio:.1%}、视觉 {coverage.vision:.1%}。视觉以 10 fps 抽样，并单独保存源帧号、PTS 毫秒与样本级人脸检测率。
 
-10 fps 下仅含0或1个视觉采样帧的锚点为 {short_visual_count}/{len(alignment)}（{short_visual_rate:.1%}），相较评审复算的旧版 731/1917（38.1%）明显下降；仍需完整动态证据时应使用 independent-500 视觉序列，而非只看 aligned-50 池化结果。
+10 fps 下仅含0或1个视觉采样帧的锚点为 {short_visual_count}/{len(alignment)}（{short_visual_rate:.1%}），相较评审复算的旧版 731/1917（38.1%）明显下降；需要比 aligned-50 更细的时间检查时可使用 independent-500 视觉序列，但超过 500 位的原始序列已经等间隔下采样，不能称为完整或无损动态证据。
 
 ## 数据质量与对齐
 
@@ -360,7 +367,7 @@ def main() -> None:
 
 当前 128 维文本 hashing、74 维音频描述符和 35 维视觉描述符是确定、可审计的 Q1 基线，并非附件2中 BERT/COVAREP/OpenFace 的同空间替代品。题面允许开源或预训练工具，但不强制第一问重建附件2特征空间；后续模型若要求语义表征，应消费附件2或在依赖与权重可用后替换相应后端，不得仅靠补零或投影伪装维数兼容。
 
-18 个重叠样本的总体中心化线性 CKA 为文本 {aggregate.loc['text'].centered_linear_cka:.4f}、音频 {aggregate.loc['audio'].centered_linear_cka:.4f}、视觉 {aggregate.loc['vision'].centered_linear_cka:.4f}。图中与 200 次确定性置换零基线对照；逐样本 54 个模态比较中 {len(invalid)} 条因变化不足无法估计。结果支持“当前描述符与附件2不可互换”，而不是证明二者等价。
+18 个重叠样本的总体中心化线性 CKA 为文本 {aggregate.loc['text'].centered_linear_cka:.4f}、音频 {aggregate.loc['audio'].centered_linear_cka:.4f}、视觉 {aggregate.loc['vision'].centered_linear_cka:.4f}。图中与 200 次确定性置换零基线对照；逐样本 54 个模态比较中 {len(invalid)} 条因变化不足无法估计。结果只支持“当前描述符与附件2不可互换”：由于两侧按相同位置编号配对而非经官方秒级时间戳核验，CKA 不能证明时间对齐准确，也不能单独判断哪套特征更适合情感识别。
 
 ## 产物与复现
 
@@ -370,7 +377,7 @@ def main() -> None:
 
 本成果仍是 Q1 本地结果，不是冻结的 I01/I02 交换包；跨用户发布须另行完成版本化握手与 wc 审批。
 """
-    (result_dir / "q1_report.md").write_text(report, encoding="utf-8")
+    write_utf8_lf(result_dir / "q1_report.md", report)
     print(json.dumps({"figure_count": len(contracts), "layout_issue_count": len(audit),
                       "coverage": coverage.to_dict(), "truncation_suspected": truncation_count}))
 

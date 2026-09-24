@@ -26,6 +26,18 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def write_utf8_lf(path: Path, text: str) -> None:
+    """Write deterministic UTF-8 text without platform newline translation."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    path.write_bytes(normalized.encode("utf-8"))
+
+
+def normalize_lf(path: Path) -> None:
+    """Normalize an existing text artifact while preserving its encoding bytes."""
+    payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    path.write_bytes(payload)
+
+
 def run(command: list[str]) -> None:
     subprocess.run(command, cwd=REPO, check=True)
 
@@ -64,6 +76,12 @@ def main() -> None:
     portable_argv = [["python", *command[1:]] for command in commands]
     portable_commands = [subprocess.list2cmdline(command) for command in portable_argv]
 
+    text_suffixes = {".csv", ".json", ".md", ".sha256", ".svg", ".yaml", ".yml"}
+    for directory in (output_dir, figure_dir):
+        for path in directory.iterdir():
+            if path.is_file() and path.suffix.lower() in text_suffixes:
+                normalize_lf(path)
+
     extraction = json.loads((output_dir / "q1_extraction_reproduction.json").read_text(encoding="utf-8"))
     overlap = json.loads((output_dir / "q1_overlap_reproduction.json").read_text(encoding="utf-8"))
     logical_outputs = {
@@ -92,14 +110,13 @@ def main() -> None:
         "outputs": {name: sha256(logical_outputs[name]) for name in sorted(logical_outputs)},
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_utf8_lf(manifest_path, json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
     checksum_files = [logical_outputs[name] for name in sorted(logical_outputs)] + [manifest_path]
     checksum_path = output_dir / "q1_checksums.sha256"
-    checksum_path.write_text(
+    write_utf8_lf(checksum_path,
         "\n".join(f"{sha256(path)}  {Path(os.path.relpath(path, output_dir)).as_posix()}"
                   for path in checksum_files) + "\n",
-        encoding="utf-8",
     )
     manifest_record = args.manifest if manifest_path.is_absolute() else manifest_path.relative_to(REPO).as_posix()
     print(json.dumps({"status": "ok", "manifest": manifest_record,

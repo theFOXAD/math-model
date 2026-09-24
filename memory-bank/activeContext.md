@@ -6,10 +6,11 @@
 - `main`、`csh`、`xjj`、`wc` 四个分支从同一初始提交建立。
 - Memory Bank、多 AI 客户端入口、PR 模板和 Git 协作规范已经就绪。
 - 竞赛题目为 E 题“复杂场景下多模态情感预测的数学建模与算法设计”。
-- 当前执行身份为 `csh`，任务分支为 `fix/csh-q1-review-remediation`。
+- 当前执行身份为 `csh`，任务分支为 `fix/csh-q1-portable-validation`。
 - 外部评审整改已完成并推送到 `origin/csh`：aligned-50 与 independent-500 双分辨率、实际解码时间轴、源帧/PTS、人脸率、空文本回退、逐维统计、CKA置换零基线和11幅图均已重算。
 - 独立 P1/P2 均 PASS（P0=0、P1=0）；根复现清单状态为 `validated`，manifest 50项、checksum 51行均零失配，但未获 wc 审批，仍不得标记 frozen 或进入论文。
-- 2026-09-24 15:39（Asia/Shanghai）额度为 AMBER：五小时剩余23%，每周剩余49%。
+- 新审查意见返工已通过独立 P2：统一 LF 生成与 Git EOL 规则，工作文件/Git索引51项哈希均零失配；报告已区分“对齐可回查”与“时间精度验证”，限制 CKA 结论，并将 independent-500 明确为固定长度确定性采样序列。
+- 2026-09-25 00:10（Asia/Shanghai）额度为 GREEN：五小时剩余57%，每周剩余41%。
 
 ## 最近决策
 
@@ -33,10 +34,11 @@
 - 18条交集审计输出57条数据行，56条可估计、1条 `insufficient_variation`；聚合CKA均与200次置换零基线对照。
 - 10张数据图与1张流程图均提供SVG、300 DPI PNG和灰度图；22个正式图文件通过 strict figure audit。
 - 最终 `validated` 单命令全链通过；manifest 50项与checksum 51行均零缺失、零失配。
+- 2026-09-25：便携校验返工全链退出码0；受管文本无CRLF，暂存Git对象51/51哈希匹配；独立P2复验PASS（P0=0、P1=0）。
 
 ## 下一步
 
-1. 由 wc 审阅已推送的 `origin/csh` 并给出 I10 集成决策。
+1. 将便携校验返工快进至并推送 `origin/csh`，随后由 wc 审阅并给出 I10 集成决策。
 2. 若下游需要语义/专业声学视觉空间，另开原子任务引入锁定的 BERT/COVAREP/OpenFace 后端；不得把当前可审计基线伪称为附件2同空间。
 3. I01/I02 作为后续独立任务执行消费者加载与冻结握手。
 

@@ -26,6 +26,17 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def write_utf8_lf(path: Path, text: str, *, bom: bool = False) -> None:
+    """Write deterministic UTF-8 text without platform newline translation."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    payload = normalized.encode("utf-8")
+    path.write_bytes((b"\xef\xbb\xbf" if bom else b"") + payload)
+
+
+def write_csv_lf(frame: pd.DataFrame, path: Path) -> None:
+    write_utf8_lf(path, frame.to_csv(index=False, lineterminator="\n"), bom=True)
+
+
 def centered_cka(x: np.ndarray, y: np.ndarray) -> float | None:
     if len(x) < 2:
         return None
@@ -147,9 +158,9 @@ def main() -> None:
             "empirical_p_ge": float((1 + np.sum(finite >= observed)) / (1 + len(finite))),
         })
     output_path = q1_dir / "q1_overlap_similarity.csv"
-    pd.DataFrame(rows).to_csv(output_path, index=False, encoding="utf-8-sig")
+    write_csv_lf(pd.DataFrame(rows), output_path)
     permutation_path = q1_dir / "q1_overlap_permutation.csv"
-    pd.DataFrame(permutation_rows).to_csv(permutation_path, index=False, encoding="utf-8-sig")
+    write_csv_lf(pd.DataFrame(permutation_rows), permutation_path)
     portable_command = ["python", "-X", "utf8", "scripts/q1_overlap_audit.py", *sys.argv[1:]]
     try:
         reference_record = reference_path.resolve().relative_to(REPO.resolve()).as_posix()
@@ -164,8 +175,8 @@ def main() -> None:
                     "permutation_count": args.permutations, "seed": args.seed,
                     "output_sha256": sha256(output_path),
                     "permutation_output_sha256": sha256(permutation_path)}
-    (q1_dir / "q1_overlap_reproduction.json").write_text(
-        json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_utf8_lf(q1_dir / "q1_overlap_reproduction.json",
+                  json.dumps(reproduction, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"overlap_count": len(overlap), "row_count": len(rows),
                       "status_counts": pd.Series([row["status"] for row in rows]).value_counts().to_dict()},
                      ensure_ascii=False))

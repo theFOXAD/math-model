@@ -33,6 +33,18 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def write_utf8_lf(path: Path, text: str, *, bom: bool = False) -> None:
+    """Write deterministic UTF-8 text without platform newline translation."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    payload = normalized.encode("utf-8")
+    path.write_bytes((b"\xef\xbb\xbf" if bom else b"") + payload)
+
+
+def write_csv_lf(frame: pd.DataFrame, path: Path) -> None:
+    """Write a spreadsheet-friendly UTF-8 CSV with stable LF bytes."""
+    write_utf8_lf(path, frame.to_csv(index=False, lineterminator="\n"), bom=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config/q1_features.yaml")
@@ -121,15 +133,15 @@ def main() -> None:
                                   "face_detection_rate": result["face_detection_rate"] if modality == "vision" else "n/a",
                                   "feature_sha256": "computed_after_write", "status": "ok" if not warnings else "warning",
                                   "warnings": warnings})
-    pd.DataFrame(sample_rows).to_csv(output / "q1_samples.csv", index=False, encoding="utf-8-sig")
-    pd.DataFrame(alignment_rows).to_csv(output / "q1_alignment.csv", index=False, encoding="utf-8-sig")
-    pd.DataFrame(quality_rows).to_csv(output / "q1_data_quality.csv", index=False, encoding="utf-8-sig")
+    write_csv_lf(pd.DataFrame(sample_rows), output / "q1_samples.csv")
+    write_csv_lf(pd.DataFrame(alignment_rows), output / "q1_alignment.csv")
+    write_csv_lf(pd.DataFrame(quality_rows), output / "q1_data_quality.csv")
     feature_hash = sha256(output / "q1_features.npz")
     unaligned_hash = sha256(output / "q1_features_unaligned.npz")
     for row in manifest_rows:
         row["feature_sha256"] = feature_hash
         row["unaligned_feature_sha256"] = ("n/a" if row["modality"] == "text" else unaligned_hash)
-    pd.DataFrame(manifest_rows).to_csv(output / "q1_feature_manifest.csv", index=False, encoding="utf-8-sig")
+    write_csv_lf(pd.DataFrame(manifest_rows), output / "q1_feature_manifest.csv")
     statistic_rows = []
     zero_variance = {}
     for modality in ("text", "audio", "vision"):
@@ -148,12 +160,12 @@ def main() -> None:
             statistic_rows.append({"modality": modality, "dimension": dimension,
                                    "valid_position_count": len(values), "mean": mean, "std": std,
                                    "min": minimum, "max": maximum, "zero_variance": std <= 1e-12})
-    pd.DataFrame(statistic_rows).to_csv(output / "q1_feature_statistics.csv", index=False, encoding="utf-8-sig")
-    (output / "q1_normalization.json").write_text(json.dumps({"method": "none", "fitted_on": None,
+    write_csv_lf(pd.DataFrame(statistic_rows), output / "q1_feature_statistics.csv")
+    write_utf8_lf(output / "q1_normalization.json", json.dumps({"method": "none", "fitted_on": None,
         "reason": "Q1 reports raw descriptors and per-dimension statistics. Train-only normalization is deferred to I01 to avoid leakage.",
         "statistics_path": "q1_feature_statistics.csv", "zero_variance_dimensions": zero_variance},
-        ensure_ascii=False, indent=2), encoding="utf-8")
-    (output / "q1_README.md").write_text(
+        ensure_ascii=False, indent=2) + "\n")
+    write_utf8_lf(output / "q1_README.md",
         "# Q1 feature bundle\n\n"
         "This directory is a question-1 result, not a frozen I01/I02 exchange bundle.\n\n"
         "- `q1_samples.csv`: labels, transcripts, IDs and sequence lengths.\n"
@@ -170,7 +182,6 @@ def main() -> None:
         "`audio_*_idx` uses 16 kHz samples; `video_*_idx` uses the 10 fps sampled list; `video_*_frame_src` uses decoded source-frame numbers. "
         "Missingness must be read from masks; never infer it from zero-valued features. Empty transcripts use 50 uniform time bins with "
         "`valid_text=False`, `padding_mask=False`, and `alignment_source=uniform_missing_text`.\n",
-        encoding="utf-8",
     )
     mask_keys = ["valid_text", "valid_audio", "valid_vision", "injected_missing_audio",
                  "injected_missing_vision", "padding_mask", "observed_text", "observed_audio", "observed_vision"]
@@ -231,8 +242,8 @@ def main() -> None:
                                     for sample, _ in extracted}},
         "invariants": invariants,
         "outputs": {p.name: sha256(p) for p in outputs}}
-    (output / "q1_extraction_reproduction.json").write_text(
-        json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_utf8_lf(output / "q1_extraction_reproduction.json",
+                  json.dumps(reproduction, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(invariants, ensure_ascii=False), flush=True)
 
 

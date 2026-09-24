@@ -12,7 +12,7 @@
     "--output-dir",
     "results/q1"
   ],
-  "elapsed_sec": 70.75533699989319,
+  "elapsed_sec": 68.26042222976685,
   "python": "3.14.3",
   "versions": {
     "numpy": "2.5.3",
@@ -22,7 +22,7 @@
     "opencv": "4.14.0"
   },
   "config_path": "config/q1_features.yaml",
-  "config_sha256": "592093a814a6c63de0f7a954bf1e379ebf5d2ccfdda60038d01039bdb5ece89d",
+  "config_sha256": "a2321039a4e4151d8ba75dbb70f9f51aff54114f3bbcea96bfe40c5bf033ff6c",
   "input_sha256": {
     "label_table": "827334f782b1f242c84ad944a657bc7f7c63643f71ae9c977811a3eecdd3ab33",
     "videos": {
@@ -160,12 +160,12 @@
   "outputs": {
     "q1_features.npz": "b4261dff718cb6a3657fa394bed1617e73ea1b32c187bd083590d60d24d23cc2",
     "q1_features_unaligned.npz": "945939ddd12064686060ad96d05424b0d23f9beea7e526ebc2ef56c838009f9c",
-    "q1_samples.csv": "848eb99e0a64b98e5def0874cf32ae17c5482ab04b5ac66a9e191e9bccde680e",
-    "q1_alignment.csv": "1a888c5b16e3049aabb6ca8ec8451eed2a1b403122669906a1ed613ed5c4c0ec",
-    "q1_feature_manifest.csv": "293813f31159bf225a6d8ba430120f14e29b3c097fca50ca884298cdc440c847",
-    "q1_data_quality.csv": "e7c1a642bccb78680815a6eee05bc3b939ce160e9811540b83ee78513dd964fb",
-    "q1_feature_statistics.csv": "ad9a367284e22b3262b3857d842ff022fb616fc6fd474dbabaf113414178eb2b",
-    "q1_normalization.json": "e670a60840022aa72f90058465cb38f4bf2b6653f318b5b8badaabbd6ddb86d6",
-    "q1_README.md": "7148520333022981c1197e1217a8961c98d84580eb90964127b8a21a4604edb0"
+    "q1_samples.csv": "a6f69ba27eed38ab2a71de06c056a557162fc2558a59990e0c498e7f3d32d450",
+    "q1_alignment.csv": "ead1711a637da72b328c386059394e367e56df4a79f261357d1f0bd3238b14ed",
+    "q1_feature_manifest.csv": "c88f1580978aec3cb7ad2b35201c30dc1c49f1f80567217e369c33508645947c",
+    "q1_data_quality.csv": "8da5df8a95468efa07fc325d4d85bb0c296f57ad50506b754a7824a14e839ff2",
+    "q1_feature_statistics.csv": "79c7a39be596ba7c0b5494b5b5d2beadd3d4f767f57d6ba33c83b557974472ac",
+    "q1_normalization.json": "7cd7ac7a267fb14e1eef4e57f8c4aad1f6847b52d3f0b5501805311b3572047b",
+    "q1_README.md": "ec20fbe077931f51b8e2b6e6cd94f7b2431daf0b9d4bcab9a958d543710dc974"
   }
 }
