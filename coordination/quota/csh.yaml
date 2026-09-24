@@ -1,14 +1,14 @@
 schema_version: "1.0"
 user: csh
-checked_at: "2026-09-24T15:32:19+08:00"
+checked_at: "2026-09-24T15:38:02+08:00"
 source: "Codex account usage limits (platform)"
 five_hour:
-  remaining_percent: 31
+  remaining_percent: 26
   reset_at: "2026-09-24T18:19:50+08:00"
 weekly:
-  remaining_percent: 51
+  remaining_percent: 50
   reset_at: "2026-09-30T11:35:31+08:00"
 warning_shown: false
 state: AMBER
-active_task_id: "E-D1-CSH-08-COMPLETE"
-next_check_at: "2026-09-24T16:17:19+08:00"
+active_task_id: "E-D1-CSH-09-PUSH"
+next_check_at: "2026-09-24T16:23:02+08:00"
