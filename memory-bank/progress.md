@@ -24,6 +24,7 @@
 - [x] 修复 P2 初检问题并完成独立 P2 终检（P0=0、P1=0，PASS）
 - [x] 根据外部评审完成问题一返工：实际解码时间轴、双分辨率、源帧/PTS、空文本、人脸率、统计表和置换零基线
 - [x] 完成返工后的独立 P1/P2 复核与最终 validated 全链（manifest/checksum 零失配）
+- [x] 将返工结果安全快进并推送到 GitHub `origin/csh`
 - [ ] 生产并验证 `dataset-bundle@1`
 - [ ] 生产并验证 `alignment-bundle@1`
 - [ ] 建立数据处理、建模、验证和制图流程

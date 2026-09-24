@@ -1,11 +1,11 @@
 # Handoff: csh
 
-- task_id: `E-D1-CSH-08`
+- task_id: `E-D1-CSH-09-PUSH`
 - owner: `csh`
-- state: `complete; validated locally; awaiting non-author integration decision`
-- branch: `fix/csh-q1-review-remediation`
+- state: `complete; validated results pushed to origin/csh`
+- branch: `csh`
 - head_commit: `e6a8e05e72fdf4df74d3dbd79c27926c8846f7b3`
-- working_tree: `clean after coordination checkpoint`
+- working_tree: `clean after final push checkpoint`
 - completed: `Analyzed the external Q1 review and remediated A3/A4, B1-B11, C2/C5/C6/C8/C9. A1/A2 were partially accepted and explicitly bounded: current 128/74/35 descriptors are an auditable baseline, not BERT/COVAREP/OpenFace-compatible features. Independent P1 and P2 both passed.`
 - changed_files: `config/q1_features.yaml; src/data/q1_dataset.py; src/features/q1_extract.py; scripts/q1_extract_features.py; scripts/q1_overlap_audit.py; scripts/q1_make_figures.py; scripts/q1_run_all.py; 题目分析报告.md; 术语表格.md; results/q1/**; results/复现清单.json; figures/q1/**; figures/q1_qa/**; memory-bank/activeContext.md; memory-bank/progress.md; coordination/quota/csh.yaml; coordination/handoffs/csh.md`
 - commands_run: `.venv\Scripts\python.exe -X utf8 scripts\q1_extract_features.py --config config/q1_features.yaml --limit 1 --output-dir results/q1_smoke_review`; empty-transcript in-memory test; `.venv\Scripts\python.exe -X utf8 scripts\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`; `check_figure.py "figures/q1/*.png" "figures/q1/*.svg" --min-dpi 300 --strict`; manifest/checksum recomputation; `git diff --check`
@@ -16,9 +16,9 @@
 - decisions: `Use max(actual decoded audio duration, actual decoded video duration) as the alignment timeline and explicit per-modality masks for absent tails. Deliver aligned-50 plus independent-500. Parse MP4 mvhd directly for declared-duration quality audit. Keep professional feature backends and forced/CTC alignment as separate dependency-backed future tasks. Keep outputs validated, not frozen, pending wc approval.`
 - uncommitted_work: `None after the coordination checkpoint.`
 - blockers: `BERT/COVAREP/OpenFace and forced/CTC runtimes/weights are unavailable; this does not block the validated lightweight baseline but blocks any claim of Attachment-2-compatible feature space.`
-- next_atomic_action: `Have a non-author review commit e6a8e05 and decide whether to merge it into csh; if accepted, run git switch csh followed by git merge --ff-only fix/csh-q1-review-remediation.`
-- resume_command: `git switch fix/csh-q1-review-remediation; git status --short; git show --stat e6a8e05; .venv\Scripts\python.exe -X utf8 scripts\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`
+- next_atomic_action: `Ask wc to review the pushed origin/csh result and issue the I10 integration decision; do not publish I01/I02 or mark artifacts frozen before that review.`
+- resume_command: `git switch csh; git fetch origin csh; git status --short; git log -3 --oneline origin/csh`
 - quota_state: `AMBER`
 - quota_source: `Codex account usage limits (platform)`
-- quota_checked_at: `2026-09-24T15:32:19+08:00`
+- quota_checked_at: `2026-09-24T15:39:52+08:00`
 - quota_reset_at: `five_hour=2026-09-24T18:19:50+08:00; weekly=2026-09-30T11:35:31+08:00`
