@@ -1,24 +1,25 @@
 # Handoff: csh
 
-- task_id: `E-D1-CSH-09-PUSH`
+- schema_version: `1.0`
+- task_id: `E-D1-CSH-10-PORTABLE-VALIDATION`
 - owner: `csh`
-- state: `complete; validated results pushed to origin/csh`
-- branch: `csh`
-- head_commit: `e6a8e05e72fdf4df74d3dbd79c27926c8846f7b3`
-- working_tree: `clean after final push checkpoint`
-- completed: `Analyzed the external Q1 review and remediated A3/A4, B1-B11, C2/C5/C6/C8/C9. A1/A2 were partially accepted and explicitly bounded: current 128/74/35 descriptors are an auditable baseline, not BERT/COVAREP/OpenFace-compatible features. Independent P1 and P2 both passed.`
-- changed_files: `config/q1_features.yaml; src/data/q1_dataset.py; src/features/q1_extract.py; scripts/q1_extract_features.py; scripts/q1_overlap_audit.py; scripts/q1_make_figures.py; scripts/q1_run_all.py; 题目分析报告.md; 术语表格.md; results/q1/**; results/复现清单.json; figures/q1/**; figures/q1_qa/**; memory-bank/activeContext.md; memory-bank/progress.md; coordination/quota/csh.yaml; coordination/handoffs/csh.md`
-- commands_run: `.venv\Scripts\python.exe -X utf8 scripts\q1_extract_features.py --config config/q1_features.yaml --limit 1 --output-dir results/q1_smoke_review`; empty-transcript in-memory test; `.venv\Scripts\python.exe -X utf8 scripts\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`; `check_figure.py "figures/q1/*.png" "figures/q1/*.svg" --min-dpi 300 --strict`; manifest/checksum recomputation; `git diff --check`
-- verification: `P1 PASS and P2 PASS, P0=0/P1=0; 100 unique samples; aligned shapes [100,50,128]/[100,50,74]/[100,50,35]; independent audio/vision [100,500,74]/[100,500,35]; every extraction invariant true; 1917 legal half-open anchors; 88/100 mvhd truncation flags; 168/1917 visual anchors contain <=1 sampled frame; overlap=18 IDs and 57 data rows (56 ok, 1 insufficient_variation); 11 PNG+11 SVG+11 grayscale figures; strict figure audit PASS; validated manifest 50/50 hashes and checksum 51/51 hashes match.`
-- artifacts_created: `results/q1/q1_features.npz; results/q1/q1_features_unaligned.npz; results/q1/q1_alignment.csv; results/q1/q1_data_quality.csv; results/q1/q1_feature_statistics.csv; results/q1/q1_overlap_similarity.csv; results/q1/q1_overlap_permutation.csv; results/q1/q1_report.md; results/q1/q1_review_remediation.md; results/q1/q1_summary.json; results/q1/q1_checksums.sha256; results/复现清单.json; figures/q1/*; figures/q1_qa/*`
-- interfaces_read: `Attachment-1 labels/videos; Attachment-2 aligned_50.pkl and its text_bert mask; external review report; no frozen cross-user interface consumed`
+- state: `complete; P2 PASS; ready to fast-forward into csh`
+- branch: `fix/csh-q1-portable-validation`
+- head_commit: `f861710`
+- working_tree: `only coordination checkpoint pending`
+- completed: `Resolved the four actionable review points: separated alignment traceability from timing-accuracy validation; bounded CKA/Procrustes interpretation; documented independent-500 as padded or deterministically subsampled rather than lossless; made text artifact bytes and Git checkout policy LF-stable; aligned validated versus not-frozen status wording.`
+- changed_files: `.gitattributes; scripts/q1_extract_features.py; scripts/q1_overlap_audit.py; scripts/q1_make_figures.py; scripts/q1_run_all.py; 题目分析报告.md; results/q1/q1_report.md; results/q1/q1_review_remediation.md; regenerated Q1 JSON/checksum records; memory-bank/activeContext.md; memory-bank/progress.md; coordination/quota/csh.yaml; coordination/handoffs/csh.md`
+- commands_run: `.venv\\Scripts\\python.exe -m py_compile scripts\\q1_extract_features.py scripts\\q1_overlap_audit.py scripts\\q1_make_figures.py scripts\\q1_run_all.py`; `.venv\\Scripts\\python.exe -X utf8 scripts\\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`; `check_figure.py figures/q1 --strict`; `figure_audit.py figures/q1 --questions q1 --strict`; working-tree and Git-index SHA-256 verification; `git diff --check`; independent P2 review`
+- verification: `Unique reproduction command exit 0; 100 unique samples; aligned shapes [100,50,128]/[100,50,74]/[100,50,35]; independent shapes [100,500,74]/[100,500,35]; 1917 legal intervals; overlap audit 57 rows with 56 ok and 1 insufficient_variation; 11 logical figures; strict figure audit exit 0; 51/51 working-tree hashes and 51/51 Git-index hashes matched; managed text CRLF count 0; independent P2 PASS with P0=0 and P1=0.`
+- artifacts_created: `Updated results/q1/q1_report.md; results/q1/q1_review_remediation.md; results/q1/q1_checksums.sha256; results/复现清单.json; deterministic regenerated metadata under results/q1/; .gitattributes`
+- interfaces_read: `Attachment-1 labels/videos; Attachment-2 aligned_50.pkl; external review screenshot; no frozen cross-user interface consumed`
 - interfaces_written: `quota-snapshot@1; handoff@1; no I01/I02/I09 published or frozen`
-- decisions: `Use max(actual decoded audio duration, actual decoded video duration) as the alignment timeline and explicit per-modality masks for absent tails. Deliver aligned-50 plus independent-500. Parse MP4 mvhd directly for declared-duration quality audit. Keep professional feature backends and forced/CTC alignment as separate dependency-backed future tasks. Keep outputs validated, not frozen, pending wc approval.`
-- uncommitted_work: `None after the coordination checkpoint.`
-- blockers: `BERT/COVAREP/OpenFace and forced/CTC runtimes/weights are unavailable; this does not block the validated lightweight baseline but blocks any claim of Attachment-2-compatible feature space.`
-- next_atomic_action: `Ask wc to review the pushed origin/csh result and issue the I10 integration decision; do not publish I01/I02 or mark artifacts frozen before that review.`
-- resume_command: `git switch csh; git fetch origin csh; git status --short; git log -3 --oneline origin/csh`
-- quota_state: `AMBER`
+- decisions: `Treat typical timeline as a traceability example only; use CKA/Procrustes only for representation non-interchangeability, not timing accuracy or emotion utility; describe independent-500 as fixed-length deterministic sampling; force LF both in generators and Git index.`
+- uncommitted_work: `Coordination checkpoint commit only; no scientific/code work pending.`
+- blockers: `No P0/P1 blocker. wc approval remains required before any frozen exchange or paper use.`
+- next_atomic_action: `Fast-forward commit f861710 and its coordination checkpoint into local csh, then push origin csh.`
+- resume_command: `git status --short; git log -2 --oneline; git switch csh; git merge --ff-only fix/csh-q1-portable-validation; git push origin csh`
+- quota_state: `GREEN`
 - quota_source: `Codex account usage limits (platform)`
-- quota_checked_at: `2026-09-24T15:39:52+08:00`
-- quota_reset_at: `five_hour=2026-09-24T18:19:50+08:00; weekly=2026-09-30T11:35:31+08:00`
+- quota_checked_at: `2026-09-25T00:10:59+08:00`
+- quota_reset_at: `five_hour=2026-09-25T04:15:16+08:00; weekly=2026-09-30T11:35:31+08:00`
