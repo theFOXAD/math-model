@@ -3,10 +3,10 @@
 - schema_version: `1.0`
 - task_id: `E-D1-CSH-10-PORTABLE-VALIDATION`
 - owner: `csh`
-- state: `complete; P2 PASS; ready to fast-forward into csh`
-- branch: `fix/csh-q1-portable-validation`
-- head_commit: `f861710`
-- working_tree: `only coordination checkpoint pending`
+- state: `complete; P2 PASS; pushed to origin/csh`
+- branch: `csh`
+- head_commit: `b96f054 (validated task plus handoff checkpoint)`
+- working_tree: `clean before final pushed-state checkpoint`
 - completed: `Resolved the four actionable review points: separated alignment traceability from timing-accuracy validation; bounded CKA/Procrustes interpretation; documented independent-500 as padded or deterministically subsampled rather than lossless; made text artifact bytes and Git checkout policy LF-stable; aligned validated versus not-frozen status wording.`
 - changed_files: `.gitattributes; scripts/q1_extract_features.py; scripts/q1_overlap_audit.py; scripts/q1_make_figures.py; scripts/q1_run_all.py; 题目分析报告.md; results/q1/q1_report.md; results/q1/q1_review_remediation.md; regenerated Q1 JSON/checksum records; memory-bank/activeContext.md; memory-bank/progress.md; coordination/quota/csh.yaml; coordination/handoffs/csh.md`
 - commands_run: `.venv\\Scripts\\python.exe -m py_compile scripts\\q1_extract_features.py scripts\\q1_overlap_audit.py scripts\\q1_make_figures.py scripts\\q1_run_all.py`; `.venv\\Scripts\\python.exe -X utf8 scripts\\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`; `check_figure.py figures/q1 --strict`; `figure_audit.py figures/q1 --questions q1 --strict`; working-tree and Git-index SHA-256 verification; `git diff --check`; independent P2 review`
@@ -15,11 +15,11 @@
 - interfaces_read: `Attachment-1 labels/videos; Attachment-2 aligned_50.pkl; external review screenshot; no frozen cross-user interface consumed`
 - interfaces_written: `quota-snapshot@1; handoff@1; no I01/I02/I09 published or frozen`
 - decisions: `Treat typical timeline as a traceability example only; use CKA/Procrustes only for representation non-interchangeability, not timing accuracy or emotion utility; describe independent-500 as fixed-length deterministic sampling; force LF both in generators and Git index.`
-- uncommitted_work: `Coordination checkpoint commit only; no scientific/code work pending.`
+- uncommitted_work: `None; no scientific/code work pending.`
 - blockers: `No P0/P1 blocker. wc approval remains required before any frozen exchange or paper use.`
-- next_atomic_action: `Fast-forward commit f861710 and its coordination checkpoint into local csh, then push origin csh.`
-- resume_command: `git status --short; git log -2 --oneline; git switch csh; git merge --ff-only fix/csh-q1-portable-validation; git push origin csh`
+- next_atomic_action: `Ask wc to review origin/csh at b96f054 or later and issue the I10 integration decision.`
+- resume_command: `git switch csh; git fetch origin csh; git status --short; git log -3 --oneline origin/csh`
 - quota_state: `GREEN`
 - quota_source: `Codex account usage limits (platform)`
-- quota_checked_at: `2026-09-25T00:10:59+08:00`
+- quota_checked_at: `2026-09-25T00:13:32+08:00`
 - quota_reset_at: `five_hour=2026-09-25T04:15:16+08:00; weekly=2026-09-30T11:35:31+08:00`

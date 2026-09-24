@@ -1,14 +1,14 @@
 schema_version: "1.0"
 user: csh
-checked_at: "2026-09-25T00:10:59+08:00"
+checked_at: "2026-09-25T00:13:32+08:00"
 source: "Codex account usage limits (platform)"
 five_hour:
-  remaining_percent: 57
+  remaining_percent: 52
   reset_at: "2026-09-25T04:15:16+08:00"
 weekly:
-  remaining_percent: 41
+  remaining_percent: 40
   reset_at: "2026-09-30T11:35:31+08:00"
 warning_shown: false
 state: GREEN
-active_task_id: "E-D1-CSH-10-PORTABLE-VALIDATION-COMPLETE"
-next_check_at: "2026-09-25T00:55:59+08:00"
+active_task_id: "E-D1-CSH-10-PORTABLE-VALIDATION-PUSHED"
+next_check_at: "2026-09-25T00:58:32+08:00"
