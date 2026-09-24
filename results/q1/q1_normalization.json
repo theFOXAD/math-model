@@ -1,5 +1,11 @@
 {
   "method": "none",
   "fitted_on": null,
-  "reason": "Question 1 emits raw descriptors; train-only fitting belongs to later I01 production."
+  "reason": "Q1 reports raw descriptors and per-dimension statistics. Train-only normalization is deferred to I01 to avoid leakage.",
+  "statistics_path": "q1_feature_statistics.csv",
+  "zero_variance_dimensions": {
+    "text": 0,
+    "audio": 0,
+    "vision": 0
+  }
 }

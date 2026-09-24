@@ -61,6 +61,8 @@ def main() -> None:
     ]
     for command in commands:
         run(command)
+    portable_argv = [["python", *command[1:]] for command in commands]
+    portable_commands = [subprocess.list2cmdline(command) for command in portable_argv]
 
     extraction = json.loads((output_dir / "q1_extraction_reproduction.json").read_text(encoding="utf-8"))
     overlap = json.loads((output_dir / "q1_overlap_reproduction.json").read_text(encoding="utf-8"))
@@ -71,12 +73,14 @@ def main() -> None:
         **{f"figure_qa/{path.name}": path for path in qa_dir.iterdir() if path.is_file()},
     }
     manifest = {
-        "schema_version": "q1-full-reproduction@1.0",
+        "schema_version": "q1-full-reproduction@1.1",
         "status": args.status,
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "seed": config["seed"],
-        "command": subprocess.list2cmdline([sys.executable, *sys.argv]),
-        "commands_run": [subprocess.list2cmdline(command) for command in commands],
+        "command": subprocess.list2cmdline(["python", "-X", "utf8", "scripts/q1_run_all.py", *sys.argv[1:]]),
+        "command_argv": ["python", "-X", "utf8", "scripts/q1_run_all.py", *sys.argv[1:]],
+        "commands_run": portable_commands,
+        "commands_run_argv": portable_argv,
         "elapsed_sec": time.time() - started,
         "environment": {"python": platform.python_version(), "platform": platform.platform()},
         "config_path": args.config,
@@ -97,7 +101,8 @@ def main() -> None:
                   for path in checksum_files) + "\n",
         encoding="utf-8",
     )
-    print(json.dumps({"status": "ok", "manifest": str(manifest_path),
+    manifest_record = args.manifest if manifest_path.is_absolute() else manifest_path.relative_to(REPO).as_posix()
+    print(json.dumps({"status": "ok", "manifest": manifest_record,
                       "checksummed_files": len(checksum_files)}, ensure_ascii=False))
 
 

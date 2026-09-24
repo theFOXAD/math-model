@@ -58,7 +58,7 @@ def discover_samples(search_root: Path, label_glob: str, video_glob: str) -> lis
                 sample_id=sample_id,
                 video_id=str(row.video_id),
                 clip_id=clip_id,
-                text=str(row.text).strip(),
+                text="" if pd.isna(row.text) else str(row.text).strip(),
                 label_intensity=float(row.label),
                 label_class=label_class,
                 label_int=label_encoding[label_class],

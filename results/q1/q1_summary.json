@@ -5,16 +5,19 @@
     "Neutral": 25,
     "Positive": 57
   },
-  "duration_sec": {
+  "decoded_duration_sec": {
     "count": 100.0,
-    "mean": 7.874980179999999,
-    "std": 4.640681440602718,
-    "min": 2.257,
-    "25%": 5.08414725,
-    "50%": 6.722493500000001,
-    "75%": 8.72548825,
-    "max": 29.288021
+    "mean": 7.862782597222222,
+    "std": 4.6409060606990575,
+    "min": 2.2355666666666667,
+    "25%": 5.141666666666667,
+    "50%": 6.7,
+    "75%": 8.7,
+    "max": 29.26666666666667
   },
+  "declared_duration_truncation_suspected_count": 88,
+  "visual_anchors_with_at_most_one_frame": 168,
+  "visual_anchors_with_at_most_one_frame_rate": 0.08763693270735524,
   "sequence_length": {
     "count": 100.0,
     "mean": 19.17,
@@ -27,15 +30,25 @@
   },
   "coverage": {
     "text": 1.0,
-    "audio": 1.0,
-    "vision": 0.9530516431924883
+    "audio": 0.9994783515910276,
+    "vision": 0.99113197704747
+  },
+  "face_detection_rate": {
+    "count": 100.0,
+    "mean": 0.5396060784556647,
+    "std": 0.4063186580641235,
+    "min": 0.0,
+    "25%": 0.06465080971659914,
+    "50%": 0.6299385425812116,
+    "75%": 0.9360994397759104,
+    "max": 1.0
   },
   "overlap_count": 18,
   "aggregate_similarity": [
     {
+      "modality": "text",
       "sample_id": "__aggregate__",
       "reference_split": "mixed",
-      "modality": "text",
       "common_position_count": 450,
       "common_rank": 128,
       "centered_linear_cka": 0.2091078389091258,
@@ -44,30 +57,68 @@
       "status_reason": "none"
     },
     {
+      "modality": "audio",
       "sample_id": "__aggregate__",
       "reference_split": "mixed",
-      "modality": "audio",
       "common_position_count": 450,
       "common_rank": 70,
-      "centered_linear_cka": 0.0813786548181793,
-      "procrustes_residual": 0.9649787400600514,
+      "centered_linear_cka": 0.0874602669236619,
+      "procrustes_residual": 0.9625229145466104,
       "status": "ok",
       "status_reason": "none"
     },
     {
+      "modality": "vision",
       "sample_id": "__aggregate__",
       "reference_split": "mixed",
-      "modality": "vision",
-      "common_position_count": 435,
+      "common_position_count": 447,
       "common_rank": 35,
-      "centered_linear_cka": 0.0307447551790237,
-      "procrustes_residual": 0.9821512265112003,
+      "centered_linear_cka": 0.0213251690232482,
+      "procrustes_residual": 0.986238057778052,
       "status": "ok",
       "status_reason": "none"
     }
   ],
-  "figure_count": 10,
-  "grayscale_qa_count": 10,
+  "permutation_null": [
+    {
+      "modality": "text",
+      "observed_aggregate_cka": 0.2091078389091258,
+      "permutation_count": 200,
+      "seed": 20260923,
+      "null_mean": 0.1358590506549116,
+      "null_std": 0.0026184915582648,
+      "null_q025": 0.1304424551939515,
+      "null_q975": 0.1413750449438782,
+      "excess_over_null_mean": 0.0732487882542141,
+      "empirical_p_ge": 0.0049751243781094
+    },
+    {
+      "modality": "audio",
+      "observed_aggregate_cka": 0.0874602669236619,
+      "permutation_count": 200,
+      "seed": 20260923,
+      "null_mean": 0.0028806310746317,
+      "null_std": 0.0031107539723004,
+      "null_q025": 0.000372035083748,
+      "null_q975": 0.0123340482764837,
+      "excess_over_null_mean": 0.0845796358490302,
+      "empirical_p_ge": 0.0049751243781094
+    },
+    {
+      "modality": "vision",
+      "observed_aggregate_cka": 0.0213251690232482,
+      "permutation_count": 200,
+      "seed": 20260923,
+      "null_mean": 0.0047859863176711,
+      "null_std": 0.0028271254147371,
+      "null_q025": 0.0014868277683523,
+      "null_q975": 0.0115963899483249,
+      "excess_over_null_mean": 0.0165391827055771,
+      "empirical_p_ge": 0.0049751243781094
+    }
+  ],
+  "figure_count": 11,
+  "grayscale_qa_count": 11,
   "layout_issue_count": 0,
   "layout_issues": []
 }

@@ -7,8 +7,10 @@ input:
 output:
   directory: results/q1
   max_length: 50
+  unaligned_length: 500
 text:
   dimension: 128
+  backend: deterministic_hashing_baseline
 audio:
   sample_rate: 16000
   window_sec: 0.025
@@ -16,9 +18,8 @@ audio:
   mel_bins: 40
   mfcc_bins: 13
 vision:
-  sample_fps: 5.0
+  sample_fps: 10.0
   hsv_bins_per_channel: 8
 alignment:
   method: proportional
   is_fallback: true
-

@@ -36,6 +36,22 @@ def centered_cka(x: np.ndarray, y: np.ndarray) -> float | None:
     return None if denominator <= EPS else float(np.sum(k * ell) / denominator)
 
 
+def permutation_null(x: np.ndarray, y: np.ndarray, count: int,
+                     rng: np.random.Generator) -> np.ndarray:
+    """Return a deterministic row-permutation null for aggregate centered CKA."""
+    x = x.astype(np.float64) - x.mean(axis=0, keepdims=True)
+    y = y.astype(np.float64) - y.mean(axis=0, keepdims=True)
+    k, ell = x @ x.T, y @ y.T
+    denominator = np.linalg.norm(k) * np.linalg.norm(ell)
+    if denominator <= EPS:
+        return np.full(count, np.nan)
+    values = np.empty(count, dtype=np.float64)
+    for index in range(count):
+        permutation = rng.permutation(len(y))
+        values[index] = np.sum(k * ell[permutation][:, permutation]) / denominator
+    return values
+
+
 def procrustes_residual(x: np.ndarray, y: np.ndarray) -> tuple[float | None, int]:
     if len(x) < 2:
         return None, 0
@@ -76,7 +92,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--q1-dir", default="results/q1")
     parser.add_argument("--reference", default=None)
+    parser.add_argument("--permutations", type=int, default=200)
+    parser.add_argument("--seed", type=int, default=20260923)
     args = parser.parse_args()
+    if args.permutations <= 0:
+        parser.error("--permutations must be a positive integer")
     q1_dir = REPO / args.q1_dir
     reference_path = Path(args.reference) if args.reference else next((REPO / "data/raw/extracted").rglob("aligned_50.pkl"))
     ours = np.load(q1_dir / "q1_features.npz")
@@ -105,19 +125,45 @@ def main() -> None:
             rows.append(metric_row(sample_id, split, modality, x, y, valid))
             aggregate[modality][0].append(x[valid])
             aggregate[modality][1].append(y[valid])
+    permutation_rows = []
+    rng = np.random.default_rng(args.seed)
     for modality, (xs, ys) in aggregate.items():
         x, y = np.concatenate(xs), np.concatenate(ys)
-        rows.append(metric_row("__aggregate__", "mixed", modality, x, y,
-                               np.ones(len(x), dtype=bool)))
+        aggregate_row = metric_row("__aggregate__", "mixed", modality, x, y,
+                                   np.ones(len(x), dtype=bool))
+        rows.append(aggregate_row)
+        null = permutation_null(x, y, args.permutations, rng)
+        finite = null[np.isfinite(null)]
+        if not len(finite):
+            raise RuntimeError(f"permutation null is undefined for modality={modality}")
+        observed = aggregate_row["centered_linear_cka"]
+        permutation_rows.append({
+            "modality": modality, "observed_aggregate_cka": observed,
+            "permutation_count": len(finite), "seed": args.seed,
+            "null_mean": float(finite.mean()), "null_std": float(finite.std()),
+            "null_q025": float(np.quantile(finite, 0.025)),
+            "null_q975": float(np.quantile(finite, 0.975)),
+            "excess_over_null_mean": float(observed - finite.mean()),
+            "empirical_p_ge": float((1 + np.sum(finite >= observed)) / (1 + len(finite))),
+        })
     output_path = q1_dir / "q1_overlap_similarity.csv"
     pd.DataFrame(rows).to_csv(output_path, index=False, encoding="utf-8-sig")
-    reproduction = {"schema_version": "q1-overlap-reproduction@1.0",
-                    "command": subprocess.list2cmdline([sys.executable, *sys.argv]),
+    permutation_path = q1_dir / "q1_overlap_permutation.csv"
+    pd.DataFrame(permutation_rows).to_csv(permutation_path, index=False, encoding="utf-8-sig")
+    portable_command = ["python", "-X", "utf8", "scripts/q1_overlap_audit.py", *sys.argv[1:]]
+    try:
+        reference_record = reference_path.resolve().relative_to(REPO.resolve()).as_posix()
+    except ValueError:
+        reference_record = f"<external>/{reference_path.name}"
+    reproduction = {"schema_version": "q1-overlap-reproduction@1.1",
+                    "command": subprocess.list2cmdline(portable_command), "command_argv": portable_command,
                     "python": platform.python_version(), "numpy": np.__version__,
                     "q1_features_sha256": sha256(q1_dir / "q1_features.npz"),
-                    "reference_path": reference_path.relative_to(REPO).as_posix(),
+                    "reference_path": reference_record,
                     "reference_sha256": sha256(reference_path), "overlap_count": len(overlap),
-                    "output_sha256": sha256(output_path)}
+                    "permutation_count": args.permutations, "seed": args.seed,
+                    "output_sha256": sha256(output_path),
+                    "permutation_output_sha256": sha256(permutation_path)}
     (q1_dir / "q1_overlap_reproduction.json").write_text(
         json.dumps(reproduction, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"overlap_count": len(overlap), "row_count": len(rows),

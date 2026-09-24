@@ -1,29 +1,29 @@
-# E题第一问：多模态特征提取与时序对齐结果
+# E题第一问：复杂场景下多模态情感预测的特征提取与时序对齐
 
 ## 结论
 
-附件1的 100 条标签与 100 个 MP4 严格一一对应，全部进入结果集。三模态统一为最长 50 个文本锚点：文本、音频、视觉张量形状分别为 `100×50×128`、`100×50×74`、`100×50×35`，均为 `float32`；有效、注入缺失与填充状态由独立布尔掩码表达。
+附件1的 100 条标签与 100 个 MP4 一一对应并全部进入结果集。可比较视图为文本、音频、视觉的 aligned-50 张量，形状分别为 `100×50×128`、`100×50×74`、`100×50×35`；另保留音频和视觉各自的 independent-500 序列，避免把原始高频时间结构永久压缩到文本锚点。所有缺失、有效和填充状态均由布尔掩码表达，禁止根据特征是否为零推断。
 
-容器平均时长 7.875 秒（范围 2.257--29.288 秒），文本锚点平均 19.17 个（范围 5--50）。按非填充锚点统计，有效覆盖率为：文本 100.0%、音频 100.0%、视觉 95.31%。未覆盖位置由显式 `valid_*` 掩码标记，不从零值特征推断缺失。
+实际可解码时间轴平均 7.863 秒（范围 2.236--29.267 秒），文本锚点平均 19.17 个。有效锚点覆盖率为文本 100.0%、音频 99.9%、视觉 99.1%。视觉以 10 fps 抽样，并单独保存源帧号、PTS 毫秒与样本级人脸检测率。
 
-## 方法与验证
+10 fps 下仅含0或1个视觉采样帧的锚点为 168/1917（8.8%），相较评审复算的旧版 731/1917（38.1%）明显下降；仍需完整动态证据时应使用 independent-500 视觉序列，而非只看 aligned-50 池化结果。
 
-1. 文本使用确定性 SHA-256 signed hashing 生成 128 维描述符；音频使用 log-Mel、MFCC、差分与统计生成 74 维描述符；视觉使用 HSV、脸部几何、运动、亮度与边缘生成 35 维描述符。
-2. 以文本锚点字符数为权重生成连续半开比例区间，明确标记 `method=proportional,is_fallback=true`，不宣称 forced alignment。
-3. 100 条样本全部完成；特征均有限；mask 为 bool 且不与 padding 冲突；时间区间覆盖音频、视频流与容器时长的共同有界区间，索引连续且有界。
+## 数据质量与对齐
 
-## 与附件2的 18 条重叠样本
+1. 对齐总时间取实际解码音频与视频时长的较大值，不再用容器声明时长截断；另一模态不存在的位置由显式 mask 表达。
+2. 共有 88/100 个 MP4 的 `mvhd` 声明时长比实际可解码音视频时间轴长 0.2 秒以上；该阈值用于排除正常的 AAC/容器尾差。`q1_data_quality.csv` 逐样本保存声明时长、实际解码时长和截断标志。这种附件1与附件2之间的采集/处理差异属于潜在域偏移。
+3. 文本锚点按字符权重生成连续半开比例区间，明确标为 `method=proportional,is_fallback=true`，置信度仅由区间内音频/视觉实际覆盖率给出，不宣称 forced alignment。空文本采用 50 个均匀时间格并将 `valid_text=False`。
 
-以本结果显式 mask 和附件2对齐 mask 选择位置。总体中心化线性 CKA 为文本 0.2091、音频 0.0814、视觉 0.0307；对应 Procrustes 残差为 0.9707、0.9650、0.9822。逐样本 54 个模态比较中，1 条为 `insufficient_variation`；具体原因记录在 `status_reason`。
+## 特征边界与附件2审计
+
+当前 128 维文本 hashing、74 维音频描述符和 35 维视觉描述符是确定、可审计的 Q1 基线，并非附件2中 BERT/COVAREP/OpenFace 的同空间替代品。题面允许开源或预训练工具，但不强制第一问重建附件2特征空间；后续模型若要求语义表征，应消费附件2或在依赖与权重可用后替换相应后端，不得仅靠补零或投影伪装维数兼容。
+
+18 个重叠样本的总体中心化线性 CKA 为文本 0.2091、音频 0.0875、视觉 0.0213。图中与 200 次确定性置换零基线对照；逐样本 54 个模态比较中 1 条因变化不足无法估计。结果支持“当前描述符与附件2不可互换”，而不是证明二者等价。
 
 ## 产物与复现
 
-- 核心数据：`q1_samples.csv`、`q1_features.npz`、`q1_alignment.csv`、`q1_feature_manifest.csv`；
-- 审计与证据：`q1_overlap_similarity.csv`、`q1_extraction_reproduction.json`、`q1_overlap_reproduction.json`、`q1_checksums.sha256`；
-- 图表：9 张候选数据图及 1 张流程图，均提供 SVG、300 DPI PNG、合同与灰度核验图。
+- 数据与审计：`q1_features.npz`、`q1_features_unaligned.npz`、`q1_alignment.csv`、`q1_data_quality.csv`、`q1_feature_statistics.csv`、`q1_overlap_similarity.csv`、`q1_overlap_permutation.csv`；
+- 图表：10 张数据图和 1 张流程图，均提供 SVG、300 DPI PNG、图表合同与灰度核验图；
+- 复现：`python -X utf8 scripts/q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated`。
 
-```powershell
-.venv\Scripts\python.exe -X utf8 scripts\q1_run_all.py --config config/q1_features.yaml --output-dir results/q1 --figure-dir figures/q1 --status validated
-```
-
-本成果仍是本地 Q1 结果，不是冻结的 I01/I02 交换包；跨用户发布须另行完成版本化握手与 wc 审批。
+本成果仍是 Q1 本地结果，不是冻结的 I01/I02 交换包；跨用户发布须另行完成版本化握手与 wc 审批。
